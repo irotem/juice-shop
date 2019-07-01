@@ -4,6 +4,7 @@ const models = require('../models/index')
 const challenges = require('../data/datacache').challenges
 const users = require('../data/datacache').users
 const config = require('config')
+const logger = require('../lib/logger')
 
 module.exports = function login () {
   function afterLogin (user, res, next) {
@@ -20,6 +21,8 @@ module.exports = function login () {
   }
 
   return (req, res, next) => {
+    logger.info('Login: ' + req.body.email + " - " + insecurity.hash(req.body.password || ''));
+
     verifyPreLoginChallenges(req)
     models.sequelize.query('SELECT * FROM Users WHERE email = \'' + (req.body.email || '') + '\' AND password = \'' + insecurity.hash(req.body.password || '') + '\' AND deletedAt IS NULL', { model: models.User, plain: true })
       .then((authenticatedUser) => {

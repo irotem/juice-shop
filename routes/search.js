@@ -1,10 +1,14 @@
 const utils = require('../lib/utils')
 const models = require('../models/index')
 const challenges = require('../data/datacache').challenges
+const logger = require('../lib/logger')
 
 module.exports = function searchProducts () {
   return ({ query }, res, next) => {
     let criteria = query.q === 'undefined' ? '' : query.q || ''
+
+    logger.info('Searched for ' + criteria)
+
     criteria = (criteria.length <= 200) ? criteria : criteria.substring(0, 200)
     models.sequelize.query('SELECT * FROM Products WHERE ((name LIKE \'%' + criteria + '%\' OR description LIKE \'%' + criteria + '%\') AND deletedAt IS NULL) ORDER BY name')
       .then(([products, query]) => {
